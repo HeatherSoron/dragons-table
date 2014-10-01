@@ -2,6 +2,8 @@ var DEBUG_MODE = true;
 
 function init() {
 	log("Application initialized");
+	
+	app.init();
 }
 
 function log(msg) {
@@ -22,3 +24,28 @@ function toggleDebugMode() {
 		elems[i].style.display = display;
 	}
 }
+
+var app = {
+	init: function() {
+		this.canvas = document.getElementById("main-map");
+		this.ctx = this.canvas.getContext("2d");
+		
+		this.feetPerGrid = 5;
+		
+		this.recalcMap();
+	},
+	
+	recalcMap: function() {
+		this.footScale = parseInt(document.getElementById("foot-to-px").value);
+		this.rows = parseInt(document.getElementById("rows").value);
+		this.cols = parseInt(document.getElementById("cols").value);
+		
+		this.gridSize = this.feetPerGrid * this.footScale;
+		
+		this.width = this.cols * this.gridSize;
+		this.height = this.rows * this.gridSize;
+		
+		this.canvas.width = this.width;
+		this.canvas.height = this.height;
+	}
+};

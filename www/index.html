@@ -5,6 +5,19 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
 	</head>
 	<body onload="init()">
+		<div class="map">
+			<div class="settings">
+				Map settings:
+				<p>
+					1 foot = <input type="number" id="foot-to-px" value=10 />px
+					<br/>
+					<input type="number" id="cols" value=4 /> wide by <input type="number" id="rows" value=4 /> tall
+				</p>
+				<button onclick="app.recalcMap()">Update Map</button>
+			</div>
+			<canvas id="main-map" width=200 height=200 />
+		</div>
+		
 		<div class="debug">
 			Log info:
 			<pre id="debug-log"></pre>
