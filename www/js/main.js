@@ -47,5 +47,24 @@ var app = {
 		
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
-	}
+		
+		this.redrawMap();
+	},
+	
+	redrawMap: function() {
+		for (var i = 1; i < this.cols; ++i) {
+			var x = i * this.gridSize - 0.5;
+			this.ctx.beginPath();
+			this.ctx.moveTo(x, 0);
+			this.ctx.lineTo(x, this.height);
+			this.ctx.stroke();
+		}
+		for (var j = 1; j < this.rows; ++j) {
+			var y = j * this.gridSize - 0.5;
+			this.ctx.beginPath();
+			this.ctx.moveTo(0, y);
+			this.ctx.lineTo(this.width, y);
+			this.ctx.stroke();
+		}
+	},
 };
