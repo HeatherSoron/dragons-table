@@ -28,43 +28,15 @@ function toggleDebugMode() {
 var app = {
 	init: function() {
 		this.canvas = document.getElementById("main-map");
-		this.ctx = this.canvas.getContext("2d");
-		
-		this.feetPerGrid = 5;
-		
+		this.map = new Map(this.canvas);
 		this.recalcMap();
 	},
 	
 	recalcMap: function() {
-		this.footScale = parseInt(document.getElementById("foot-to-px").value);
-		this.rows = parseInt(document.getElementById("rows").value);
-		this.cols = parseInt(document.getElementById("cols").value);
+		footScale = parseInt(document.getElementById("foot-to-px").value);
+		rows = parseInt(document.getElementById("rows").value);
+		cols = parseInt(document.getElementById("cols").value);
 		
-		this.gridSize = this.feetPerGrid * this.footScale;
-		
-		this.width = this.cols * this.gridSize;
-		this.height = this.rows * this.gridSize;
-		
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
-		
-		this.redrawMap();
-	},
-	
-	redrawMap: function() {
-		for (var i = 1; i < this.cols; ++i) {
-			var x = i * this.gridSize - 0.5;
-			this.ctx.beginPath();
-			this.ctx.moveTo(x, 0);
-			this.ctx.lineTo(x, this.height);
-			this.ctx.stroke();
-		}
-		for (var j = 1; j < this.rows; ++j) {
-			var y = j * this.gridSize - 0.5;
-			this.ctx.beginPath();
-			this.ctx.moveTo(0, y);
-			this.ctx.lineTo(this.width, y);
-			this.ctx.stroke();
-		}
+		this.map.recalc(footScale, rows, cols);
 	},
 };
