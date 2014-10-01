@@ -29,6 +29,7 @@ var app = {
 	init: function() {
 		this.canvas = document.getElementById("main-map");
 		this.map = new Map(this.canvas);
+		this.map.addObject(new Drawable(2, 1));
 		this.recalcMap();
 	},
 	

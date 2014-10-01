@@ -1,9 +1,17 @@
+var GRID_FEET = 5;
+
 function Map(canvas) {
 	this.canvas = canvas;
+	
+	this.objects = [];
 	
 	this.ctx = this.canvas.getContext("2d");
 	
 	this.feetPerGrid = 5;
+}
+
+Map.prototype.addObject = function(obj) {
+	this.objects.push(obj);
 }
 
 Map.prototype.recalc = function(footScale, rows, cols) {
@@ -37,4 +45,23 @@ Map.prototype.redraw = function() {
 		this.ctx.lineTo(this.width, y);
 		this.ctx.stroke();
 	}
+	
+	for (var i = 0; i < this.objects.length; ++i) {
+		this.objects[i].draw(this.ctx, this.footScale);
+	}
+}
+
+function Drawable(x, y) {
+	this.x = x;
+	this.y = y;
+	this.feet = 3;
+}
+
+Drawable.prototype.draw = function(ctx, scale) {
+	var xpx = (this.x + 0.5) * GRID_FEET * scale;
+	var ypx = (this.y + 0.5) * GRID_FEET * scale;
+	var radius = this.feet * scale / 2;
+	ctx.beginPath();
+	ctx.arc(xpx, ypx, radius, 0, 2 * Math.PI, true);
+	ctx.fill();
 }
