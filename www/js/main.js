@@ -26,6 +26,13 @@ function getElemCoords(el) {
 	return { top: _y, left: _x };
 }
 
+function getLocalEventPos(evt, elem) {
+	var coords = getElemCoords(elem);
+	var x = evt.pageX - coords.left;
+	var y = evt.pageY - coords.top;
+	return {x: x, y: y};
+}
+
 function toggleDebugMode() {
 	log("Toggling debug. Current state: " + (DEBUG_MODE ? "on" : "off"));
 	DEBUG_MODE = !DEBUG_MODE;
@@ -44,15 +51,55 @@ var app = {
 		this.map.addObject(new Drawable(2, 1));
 		this.recalcMap();
 		
+		this.pointer = undefined;
+		this.selectedObject = undefined;
+		
 		// note: Phonegap seems to send both mousedown and touchstart? Needs experimentation
 		this.canvas.addEventListener('mousedown', function(e) { log("mousedown"); app.handlePointerStart(e, app.canvas); } );
+		this.canvas.addEventListener('mousemove', function(e) { app.handlePointerMove(e, app.canvas); } );
+		this.canvas.addEventListener('mouseup', function(e) { app.handlePointerEnd(e, app.canvas); } );
 		this.canvas.addEventListener('touchstart', function(e) { log("touchstart"); app.handlePointerStart(e.changedTouches[0], app.canvas); } );
 	},
 	
 	handlePointerStart: function(evt, elem) {
-		var coords = getElemCoords(elem);
-		log(evt.pageX - coords.left);
-		log(evt.pageY - coords.top);
+		this.pointer = getLocalEventPos(evt, elem);
+		
+		log(this.pointer.x);
+		log(this.pointer.y);
+		
+		this.selectMapObject();
+	},
+	
+	handlePointerMove: function(evt, elem) {
+		this.pointer = getLocalEventPos(evt, elem);
+		if (this.selectedObject) {
+			this.moveMapObject();
+		}
+	},
+	
+	handlePointerUp: function(evt, elem) {
+		this.pointer = undefined;
+		this.releaseMapObject();
+	},
+	
+	selectMapObject: function() {
+		this.selectedObject = this.map.getObjectAtPixels(this.pointer);
+		if (this.selectedObject) {
+			log("Selected object at: " + this.selectedObject.x + "," + this.selectedObject.y);
+		} else {
+			log("No object selected");
+		}
+	},
+	
+	moveMapObject: function() {
+		var gridPos = this.map.pxToGrid(this.pointer);
+		this.selectedObject.x = gridPos.x;
+		this.selectedObject.y = gridPos.y;
+		this.map.redraw();
+	},
+	
+	releaseMapObject: function() {
+		this.selectedObject = null;
 	},
 	
 	recalcMap: function() {

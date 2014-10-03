@@ -10,8 +10,30 @@ function Map(canvas) {
 	this.feetPerGrid = 5;
 }
 
+Map.prototype.pxToGrid = function(px) {
+	var grid = {};
+	for (var coord in px) {
+		grid[coord] = Math.floor(px[coord] / (this.feetPerGrid * this.footScale));
+	}
+	return grid;
+}
+
 Map.prototype.addObject = function(obj) {
 	this.objects.push(obj);
+}
+
+Map.prototype.getObjectAtPixels = function(pos) {
+	return this.getObjectAtGrid(this.pxToGrid(pos));
+}
+
+Map.prototype.getObjectAtGrid = function(pos) {
+	for (var i = 0; i < this.objects.length; ++i) {
+		var obj = this.objects[i];
+		if (pos.x == Math.round(obj.x) && pos.y == Math.round(obj.y)) {
+			return obj;
+		}
+	}
+	return undefined;
 }
 
 Map.prototype.recalc = function(footScale, rows, cols) {
@@ -29,8 +51,9 @@ Map.prototype.recalc = function(footScale, rows, cols) {
 	
 	this.redraw();
 }
-	
+
 Map.prototype.redraw = function() {
+	this.clear();
 	for (var i = 1; i < this.cols; ++i) {
 		var x = i * this.gridSize - 0.5;
 		this.ctx.beginPath();
@@ -49,6 +72,13 @@ Map.prototype.redraw = function() {
 	for (var i = 0; i < this.objects.length; ++i) {
 		this.objects[i].draw(this.ctx, this.footScale);
 	}
+}
+
+Map.prototype.clear = function() {
+	var width = this.canvas.width;
+	var height = this.canvas.height;
+	
+	this.ctx.clearRect(0, 0, width, height);
 }
 
 function Drawable(x, y) {
