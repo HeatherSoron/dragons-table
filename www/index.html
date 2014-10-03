@@ -7,7 +7,14 @@
 	</head>
 	<body onload="init()">
 		<div class="map">
-			<div class="settings">
+			<div class="left">
+				x-coord: <input type="number" id="x-coord" value=0 />
+				<br/>
+				y-coord: <input type="number" id="y-coord" value=0 />
+				<br/>
+				<button onclick="app.addMapObject()">Add Map Object</button>
+			</div>
+			<div class="settings left">
 				Map settings:
 				<p>
 					1 foot = <input type="number" id="foot-to-px" value=10 />px

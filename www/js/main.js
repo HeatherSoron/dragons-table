@@ -48,7 +48,6 @@ var app = {
 	init: function() {
 		this.canvas = document.getElementById("main-map");
 		this.map = new Map(this.canvas);
-		this.map.addObject(new Drawable(2, 1));
 		this.recalcMap();
 		
 		this.pointer = undefined;
@@ -101,6 +100,14 @@ var app = {
 	
 	releaseMapObject: function() {
 		this.selectedObject = null;
+	},
+	
+	addMapObject: function() {
+		var x = parseInt(document.getElementById("x-coord").value);
+		var y = parseInt(document.getElementById("y-coord").value);
+		
+		this.map.addObject(new Drawable(x, y));
+		this.map.redraw();
 	},
 	
 	recalcMap: function() {
