@@ -140,9 +140,7 @@ var app = {
 			app.syncMapData(msg);
 		});
 		
-		this.socket.on('alert', function(msg) {
-			alert(msg);
-		});
+		this.socket.on('alert', alert);
 		
 		var identification = {
 			version: '0.1.0',
