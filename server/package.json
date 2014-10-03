@@ -1,6 +1,6 @@
 {
   "name": "tabletop-planner-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "server code for the Tabletop Planner app (working name)",
   "dependencies": {
     "body-parser": "^1.9.0",

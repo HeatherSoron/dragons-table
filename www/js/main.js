@@ -154,12 +154,17 @@ var app = {
 		this.socket.on('alert', alert);
 		
 		var identification = {
-			version: '0.1.0',
+			version: '0.1.1',
 		};
 		
 		this.socket.emit('identify', identification);
 		this.socket.on('re-identify', function(msg) {
 			app.socket.emit('identify', identification);
+		});
+		
+		this.socket.on('ghost', function(msg) {
+			app.map.objects[msg.id].ghost = msg.position;
+			app.map.redraw();
 		});
 	},
 	
