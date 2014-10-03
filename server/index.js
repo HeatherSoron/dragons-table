@@ -40,6 +40,9 @@ io.on('connection', function(socket) {
 			console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
 		}
 	});
+	socket.on('debug test', function(msg) {
+		socket.emit('debug test echo', msg);
+	});
 	if (!socket.identified) {
 		socket.emit('re-identify');
 	}
