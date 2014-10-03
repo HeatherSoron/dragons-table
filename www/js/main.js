@@ -93,18 +93,29 @@ var app = {
 	},
 	
 	moveMapObject: function() {
-		var gridPos = this.map.pxToGrid(this.pointer);
-		this.selectedObject.x = gridPos.x;
-		this.selectedObject.y = gridPos.y;
+		var gridPos = this.map.pxToGrid(this.pointer, true);
+		gridPos.x -= 0.5;
+		gridPos.y -= 0.5;
+		this.selectedObject.ghost = gridPos;
+		
+		if (this.socket) {
+			var index = this.map.objects.indexOf(this.selectedObject);
+			this.socket.emit('ghost', {id: index, position: gridPos});
+		}
+		
 		this.map.redraw();
 	},
 	
 	releaseMapObject: function() {
-		this.selectedObject = null;
+		if (this.selectedObject) {
+			this.selectedObject.snapToGhost();
+			this.selectedObject = undefined;
+			this.map.redraw();
 		
-		if (this.socket) {
-			log("Sending map info");
-			this.socket.emit("map sync", this.map.objects);
+			if (this.socket) {
+				log("Sending map info");
+				this.socket.emit("map sync", this.map.objects);
+			}
 		}
 	},
 	

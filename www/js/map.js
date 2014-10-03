@@ -10,10 +10,14 @@ function Map(canvas) {
 	this.feetPerGrid = 5;
 }
 
-Map.prototype.pxToGrid = function(px) {
+Map.prototype.pxToGrid = function(px, useFloat) {
 	var grid = {};
 	for (var coord in px) {
-		grid[coord] = Math.floor(px[coord] / (this.feetPerGrid * this.footScale));
+		var newVal = px[coord] / (this.feetPerGrid * this.footScale);
+		if (!useFloat) {
+			newVal = Math.floor(newVal);
+		}
+		grid[coord] = newVal;
 	}
 	return grid;
 }
@@ -87,11 +91,25 @@ function Drawable(x, y) {
 	this.feet = 3;
 }
 
-Drawable.prototype.draw = function(ctx, scale) {
-	var xpx = (this.x + 0.5) * GRID_FEET * scale;
-	var ypx = (this.y + 0.5) * GRID_FEET * scale;
+Drawable.prototype.draw = function(ctx, scale, ghost) {
+	var obj = ghost ? ghost : this;
+	var xpx = (obj.x + 0.5) * GRID_FEET * scale;
+	var ypx = (obj.y + 0.5) * GRID_FEET * scale;
 	var radius = this.feet * scale / 2;
 	ctx.beginPath();
 	ctx.arc(xpx, ypx, radius, 0, 2 * Math.PI, true);
 	ctx.fill();
+	
+	if (!ghost && this.ghost) {
+		var oldAlpha = ctx.globalAlpha;
+		ctx.globalAlpha = 0.5;
+		this.draw(ctx, scale, this.ghost);
+		ctx.globalAlpha = oldAlpha;
+	}
+}
+
+Drawable.prototype.snapToGhost = function() {
+	this.x = Math.round(this.ghost.x);
+	this.y = Math.round(this.ghost.y);
+	this.ghost = undefined;
 }
