@@ -100,6 +100,11 @@ var app = {
 	
 	releaseMapObject: function() {
 		this.selectedObject = null;
+		
+		if (this.socket) {
+			log("Sending map info");
+			this.socket.emit("map sync", this.map.objects);
+		}
 	},
 	
 	addMapObject: function() {
@@ -118,6 +123,37 @@ var app = {
 		this.map.recalc(footScale, rows, cols);
 	},
 	
+	syncMapData: function(data) {
+		for (var key in data) {
+			data[key] = new Drawable(data[key].x, data[key].y);
+		}
+		
+		this.map.objects = data;
+		this.map.redraw();
+	},
+	
+	configureSocket: function(url) {
+		this.socket = io(url);
+		log("WebSockets connect: " + url);
+		this.socket.on("map sync", function(msg) {
+			app.syncMapData(msg);
+		});
+	},
+	
+	connect: function() {
+		var hostUrl = this.getHostUrl();
+		// script-loading taken from http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
+		var s = document.createElement('script');
+		s.type = 'text/javascript';
+		s.async = true;
+		s.src = hostUrl + 'socket.io/socket.io.js';
+
+		s.addEventListener('load', function() { app.configureSocket(hostUrl); });
+		
+		var x = document.getElementsByTagName('script')[0];
+		x.parentNode.insertBefore(s, x);
+	},
+	
 	download: function() {
 		var req = new XMLHttpRequest();
 		req.open('GET', this.getHostUrl(), false);
@@ -126,13 +162,7 @@ var app = {
 		log("server response: " + raw);
 		var data = JSON.parse(raw);
 		
-		
-		for (var key in data) {
-			data[key] = new Drawable(data[key].x, data[key].y);
-		}
-		
-		this.map.objects = data;
-		this.map.redraw();
+		this.syncMapData(data);
 	},
 	
 	upload: function() {
