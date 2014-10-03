@@ -59,6 +59,7 @@ var app = {
 		this.canvas.addEventListener('mouseup', function(e) { app.handlePointerEnd(e, app.canvas); } );
 		this.canvas.addEventListener('touchstart', function(e) { log("touchstart"); app.handlePointerStart(e.changedTouches[0], app.canvas); } );
 		this.canvas.addEventListener('touchmove', function(e) { e.preventDefault(); app.handlePointerMove(e.changedTouches[0], app.canvas); } );
+		this.canvas.addEventListener('touchend', function(e) { app.handlePointerEnd(e.changedTouches[0], app.canvas); } );
 	},
 	
 	handlePointerStart: function(evt, elem) {
