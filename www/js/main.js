@@ -139,6 +139,19 @@ var app = {
 		this.socket.on("map sync", function(msg) {
 			app.syncMapData(msg);
 		});
+		
+		this.socket.on('alert', function(msg) {
+			alert(msg);
+		});
+		
+		var identification = {
+			version: '0.1.0',
+		};
+		
+		this.socket.emit('identify', identification);
+		this.socket.on('re-identify', function(msg) {
+			app.socket.emit('identify', identification);
+		});
 	},
 	
 	connect: function() {

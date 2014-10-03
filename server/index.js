@@ -7,6 +7,8 @@ var io = require('socket.io')(http);
 
 var state = [];
 
+var minClientVersion = '0.1.0';
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -24,13 +26,39 @@ app.post('/', function(req, res) {
 
 io.on('connection', function(socket) {
 	console.log('WebSockets connection started');
-	socket.on('map sync', function(msg) {
-		console.log("map sync triggered with: " + JSON.stringify(msg));
-		state = msg;
-		socket.broadcast.emit('map sync', msg);
+	socket.on('identify', function(msg) {
+		console.log("connection identified as: " + JSON.stringify(msg));
+		if (validVersion(msg.version)) {
+			socket.on('map sync', function(msg) {
+				console.log("map sync triggered with: " + JSON.stringify(msg));
+				state = msg;
+				socket.broadcast.emit('map sync', msg);
+			});
+			socket.identified = true;
+		} else {
+			socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
+			console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
+		}
 	});
+	if (!socket.identified) {
+		socket.emit('re-identify');
+	}
 });
 
 http.listen(3000, function(){
 	console.log('listening on *:3000');
 });
+
+function validVersion(version) {
+	var min = minClientVersion.split(/\.-/);
+	var actual = version.split(/\.-/);
+	
+	for (var i = 0; i < min.length; ++i) {
+		if (actual[i] > min[i]) {
+			return true;
+		} else if (actual[i] < min[i]) {
+			return false;
+		}
+	}
+	return true;
+}
