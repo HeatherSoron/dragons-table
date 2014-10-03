@@ -78,7 +78,7 @@ var app = {
 		}
 	},
 	
-	handlePointerUp: function(evt, elem) {
+	handlePointerEnd: function(evt, elem) {
 		this.pointer = undefined;
 		this.releaseMapObject();
 	},
