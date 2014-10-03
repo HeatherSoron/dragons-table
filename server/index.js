@@ -31,6 +31,8 @@ io.on('connection', function(socket) {
 		socket.identified = true;
 		
 		if (validVersion(msg.version)) {
+			socket.emit('map sync', state);
+			
 			socket.on('map sync', function(msg) {
 				console.log("map sync triggered with: " + JSON.stringify(msg));
 				state = msg;
