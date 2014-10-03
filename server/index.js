@@ -1,10 +1,19 @@
 var app = require('express')();
+var bodyParser = require('body-parser');
 var http = require('http').Server(app);
 
-app.get('/', function(req, res){
-  res.send('<h1>Hello world</h1>');
+var state = {};
+
+app.use(bodyParser.json());
+
+app.get('/', function(req, res) {
+	res.send(JSON.stringify(state));
+});
+
+app.post('/', function(req, res) {
+	console.log(req.body);
 });
 
 http.listen(3000, function(){
-  console.log('listening on *:3000');
+	console.log('listening on *:3000');
 });

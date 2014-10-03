@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "server code for the Tabletop Planner app (working name)",
   "dependencies": {
+    "body-parser": "^1.9.0",
     "express": "^4.9.5"
   }
 }

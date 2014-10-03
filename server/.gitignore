@@ -1,2 +1,4 @@
+*.log
+
 # well, I THINK we don't need to track these in Git, since the dependencies are tracked
 node_modules/
