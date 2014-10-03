@@ -1,5 +1,7 @@
 var DEBUG_MODE = true;
 
+var CLIENT_VERSION = '0.1.2';
+
 function init() {
 	log("Application initialized");
 	
@@ -46,6 +48,9 @@ function toggleDebugMode() {
 
 var app = {
 	init: function() {
+		var defaultHost = document.location.href.replace(/^http:../g,"").replace(/\/.*/g,"");
+		document.getElementById('hostname').value = defaultHost;
+		
 		this.canvas = document.getElementById("main-map");
 		this.map = new Map(this.canvas);
 		this.recalcMap();
@@ -154,7 +159,7 @@ var app = {
 		this.socket.on('alert', alert);
 		
 		var identification = {
-			version: '0.1.1',
+			version: CLIENT_VERSION,
 		};
 		
 		this.socket.emit('identify', identification);
