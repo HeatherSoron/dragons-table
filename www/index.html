@@ -6,6 +6,12 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
 	</head>
 	<body onload="init()">
+		<div class="networking">
+			Host: <input id="hostname"/>
+			<button onclick="app.download()">Download</button>
+			<button onclick="app.upload()">Upload</button>
+		</div>
+		
 		<div class="map">
 			<div class="left">
 				x-coord: <input type="number" id="x-coord" value=0 />

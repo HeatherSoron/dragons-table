@@ -117,4 +117,33 @@ var app = {
 		
 		this.map.recalc(footScale, rows, cols);
 	},
+	
+	download: function() {
+		var req = new XMLHttpRequest();
+		req.open('GET', this.getHostUrl(), false);
+		req.send();
+		var raw = req.responseText;
+		log("server response: " + raw);
+		var data = JSON.parse(raw);
+		
+		
+		for (var key in data) {
+			data[key] = new Drawable(data[key].x, data[key].y);
+		}
+		
+		this.map.objects = data;
+		this.map.redraw();
+	},
+	
+	upload: function() {
+		var req = new XMLHttpRequest();
+		req.open('POST', this.getHostUrl());
+		req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		req.send(JSON.stringify(this.map.objects));
+	},
+	
+	getHostUrl: function() {
+		var hostname = document.getElementById('hostname').value;
+		return 'http://' + hostname + '/';
+	},
 };
