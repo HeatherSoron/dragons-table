@@ -5,7 +5,7 @@ var cors = require('cors');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var state = {};
+var state = [];
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -26,6 +26,7 @@ io.on('connection', function(socket) {
 	console.log('WebSockets connection started');
 	socket.on('map sync', function(msg) {
 		console.log("map sync triggered with: " + JSON.stringify(msg));
+		state = msg;
 		socket.broadcast.emit('map sync', msg);
 	});
 });
