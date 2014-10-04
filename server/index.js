@@ -7,7 +7,7 @@ var io = require('socket.io')(http);
 
 var state = [];
 
-var minClientVersion = '0.1.0';
+var minClientVersion = '0.2.0';
 
 app.use(bodyParser.json());
 app.use(cors());

@@ -1,6 +1,6 @@
 var DEBUG_MODE = true;
 
-var CLIENT_VERSION = '0.1.2';
+var CLIENT_VERSION = '0.2.0';
 
 function init() {
 	log("Application initialized");
@@ -128,7 +128,11 @@ var app = {
 		var x = parseInt(document.getElementById("x-coord").value);
 		var y = parseInt(document.getElementById("y-coord").value);
 		
-		this.map.addObject(new Drawable(x, y));
+		var r = parseInt(document.getElementById("red").value);
+		var g = parseInt(document.getElementById("green").value);
+		var b = parseInt(document.getElementById("blue").value);
+		
+		this.map.addObject(new Drawable(x, y, 'rgb(' + r + ',' + g + ',' + b + ')'));
 		this.map.redraw();
 	},
 	
@@ -142,7 +146,7 @@ var app = {
 	
 	syncMapData: function(data) {
 		for (var key in data) {
-			data[key] = new Drawable(data[key].x, data[key].y);
+			data[key] = new Drawable(data[key].x, data[key].y, data[key].color);
 		}
 		
 		this.map.objects = data;
@@ -156,7 +160,9 @@ var app = {
 			app.syncMapData(msg);
 		});
 		
-		this.socket.on('alert', alert);
+		this.socket.on('alert', function(msg) {
+			alert(msg);
+		});
 		
 		var identification = {
 			version: CLIENT_VERSION,

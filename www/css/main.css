@@ -5,3 +5,7 @@ ul.navbar {
 canvas {
 	border: 1px solid black;
 }
+
+input.color {
+	width: 6ex;
+}

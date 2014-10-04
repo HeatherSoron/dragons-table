@@ -85,9 +85,10 @@ Map.prototype.clear = function() {
 	this.ctx.clearRect(0, 0, width, height);
 }
 
-function Drawable(x, y) {
+function Drawable(x, y, color) {
 	this.x = x;
 	this.y = y;
+	this.color = color;
 	this.feet = 3;
 }
 
@@ -96,6 +97,8 @@ Drawable.prototype.draw = function(ctx, scale, ghost) {
 	var xpx = (obj.x + 0.5) * GRID_FEET * scale;
 	var ypx = (obj.y + 0.5) * GRID_FEET * scale;
 	var radius = this.feet * scale / 2;
+	
+	ctx.fillStyle = this.color ? this.color : 'rgb(0,0,0)';
 	ctx.beginPath();
 	ctx.arc(xpx, ypx, radius, 0, 2 * Math.PI, true);
 	ctx.fill();
