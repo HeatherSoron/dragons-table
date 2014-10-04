@@ -9,3 +9,7 @@ canvas {
 input.color {
 	width: 6ex;
 }
+
+input.coord {
+	width: 8ex;
+}
