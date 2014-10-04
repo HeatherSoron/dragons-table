@@ -85,11 +85,11 @@ Map.prototype.clear = function() {
 	this.ctx.clearRect(0, 0, width, height);
 }
 
-function Drawable(x, y, color) {
+function Drawable(x, y, color, size) {
 	this.x = x;
 	this.y = y;
 	this.color = color;
-	this.feet = 3;
+	this.feet = size ? size : 3;
 }
 
 Drawable.prototype.draw = function(ctx, scale, ghost) {

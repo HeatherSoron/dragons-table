@@ -1,6 +1,6 @@
 var DEBUG_MODE = true;
 
-var CLIENT_VERSION = '0.3.0';
+var CLIENT_VERSION = '0.3.1';
 
 function init() {
 	log("Application initialized");
@@ -125,11 +125,15 @@ var app = {
 		var x = parseInt(document.getElementById("x-coord").value);
 		var y = parseInt(document.getElementById("y-coord").value);
 		
+		var size = parseFloat(document.getElementById("obj-size").value);
+		
 		var r = parseInt(document.getElementById("red").value);
 		var g = parseInt(document.getElementById("green").value);
 		var b = parseInt(document.getElementById("blue").value);
 		
-		this.map.addObject(new Drawable(x, y, 'rgb(' + r + ',' + g + ',' + b + ')'));
+		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
+		
+		this.map.addObject(new Drawable(x, y, color, size));
 		
 		this.sendMapData();
 		
@@ -159,6 +163,7 @@ var app = {
 		for (var i = 0; i < objList.length; ++i) {
 			var obj = objList[i];
 			objList[i] = new Drawable(obj.x, obj.y, obj.color);
+			objList[i].feet = obj.feet;
 		}
 		
 		this.map.objects = objList;
