@@ -1,6 +1,6 @@
 var DEBUG_MODE = true;
 
-var CLIENT_VERSION = '0.2.0';
+var CLIENT_VERSION = '0.3.0';
 
 function init() {
 	log("Application initialized");
@@ -117,10 +117,7 @@ var app = {
 			this.selectedObject = undefined;
 			this.map.redraw();
 		
-			if (this.socket) {
-				log("Sending map info");
-				this.socket.emit("map sync", this.map.objects);
-			}
+			this.sendMapData();
 		}
 	},
 	
@@ -133,24 +130,51 @@ var app = {
 		var b = parseInt(document.getElementById("blue").value);
 		
 		this.map.addObject(new Drawable(x, y, 'rgb(' + r + ',' + g + ',' + b + ')'));
+		
+		this.sendMapData();
+		
 		this.map.redraw();
 	},
 	
-	recalcMap: function() {
+	recalcMap: function(localOnly) {
 		footScale = parseInt(document.getElementById("foot-to-px").value);
 		rows = parseInt(document.getElementById("rows").value);
 		cols = parseInt(document.getElementById("cols").value);
 		
 		this.map.recalc(footScale, rows, cols);
+		if (!localOnly) {
+			this.sendMapData();
+		}
 	},
 	
 	syncMapData: function(data) {
-		for (var key in data) {
-			data[key] = new Drawable(data[key].x, data[key].y, data[key].color);
+		if (data.rows) {
+			document.getElementById('rows').value = data.rows;
+		}
+		if (data.cols) {
+			document.getElementById('cols').value = data.cols;
 		}
 		
-		this.map.objects = data;
-		this.map.redraw();
+		var objList = data.objects;
+		for (var i = 0; i < objList.length; ++i) {
+			var obj = objList[i];
+			objList[i] = new Drawable(obj.x, obj.y, obj.color);
+		}
+		
+		this.map.objects = objList;
+		this.recalcMap(true);
+	},
+	
+	sendMapData: function() {
+		if (this.socket) {
+			log("Sending map info");
+			var data = {
+				rows: this.map.rows,
+				cols: this.map.cols,
+				objects: this.map.objects
+			};
+			this.socket.emit("map sync", data);
+		}
 	},
 	
 	configureSocket: function(url) {

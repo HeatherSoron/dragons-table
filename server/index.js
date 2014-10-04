@@ -5,9 +5,11 @@ var cors = require('cors');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var state = [];
+var state = {
+	objects: [],
+};
 
-var minClientVersion = '0.2.0';
+var minClientVersion = '0.3.0';
 
 app.use(bodyParser.json());
 app.use(cors());
