@@ -15,18 +15,19 @@
 		
 		<div class="map">
 			<div class="left">
-				x: <input type="number" class="coord" id="x-coord" value=0 />
-				y: <input type="number" class="coord" id="y-coord" value=0 />
+				x: <input type="number" class="coord" id="x-coord" min=0 value=0 />
+				y: <input type="number" class="coord" id="y-coord" min=0 value=0 />
 				
 				<br/>
 				
-				size: <input type="number" class="coord" id="obj-size" value=3.0 />
+				<!-- should bump up that max value, AFTER adding support for multi-cell objects (D&D/PF Large-and-larger creatures) -->
+				size: <input type="number" class="coord" id="obj-size" min=1.0 step="any" max=6.0 value=3.0 />
 				
 				<br/>
 				
-				r: <input type="number" class="color" id="red" value=0 />
-				g: <input type="number" class="color" id="green" value=0 />
-				b: <input type="number" class="color" id="blue" value=0 />
+				r: <input type="number" class="color" id="red" min=0 max=255 value=0 />
+				g: <input type="number" class="color" id="green" min=0 max=255 value=0 />
+				b: <input type="number" class="color" id="blue" min=0 max=255 value=0 />
 				<br/>
 				<button onclick="app.addMapObject()">Add Map Object</button>
 			</div>
@@ -35,7 +36,7 @@
 				<p>
 					1 foot = <input type="number" class="coord" id="foot-to-px" value=10 />px
 					<br/>
-					<input type="number" class="coord" id="cols" value=4 /> wide by <input type="number" class="coord" id="rows" value=4 /> tall
+					<input type="number" class="coord" id="cols" min=2 value=4 /> wide by <input type="number" class="coord" id="rows" min=2 value=4 /> tall
 				</p>
 				<button onclick="app.recalcMap()">Update Map</button>
 			</div>
