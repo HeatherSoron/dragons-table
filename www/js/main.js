@@ -133,7 +133,10 @@ var app = {
 		
 		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 		
-		this.map.addObject(new Drawable(x, y, color, size));
+		var obj = new Drawable(x, y, color, size);
+		obj.name = document.getElementById("obj-name").value;
+		
+		this.map.addObject(obj);
 		
 		this.sendMapData();
 		
@@ -149,6 +152,29 @@ var app = {
 		if (!localOnly) {
 			this.sendMapData();
 		}
+		
+		this.updateObjectList();
+	},
+	
+	updateObjectList: function() {
+		var html = "";
+		for (var i = 0; i < this.map.objects.length; ++i) {
+			var obj = this.map.objects[i];
+			var label = "#" + i;
+			if (obj.name) {
+				label = obj.name + " (" + label + ")";
+			}
+			html += '<option value="' + i + '">' + label + '</option>\n';
+		}
+		// this is... probably not the most efficient way to do things. But it works.
+		document.getElementById("object-list").innerHTML = html;
+	},
+	
+	removeMapObject: function() {
+		var elem = document.getElementById("object-list");
+		var selected = elem.options[elem.selectedIndex];
+		this.map.objects.splice(parseInt(selected.value), 1);
+		this.recalcMap();
 	},
 	
 	syncMapData: function(data) {
