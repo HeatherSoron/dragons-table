@@ -13,3 +13,7 @@ input.color {
 input.coord {
 	width: 8ex;
 }
+
+input {
+	margin: 2px 0px;
+}
