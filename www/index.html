@@ -15,7 +15,7 @@
 		
 		<div class="map">
 			<div class="add-object left">
-				Name (optional): <input id="obj-name" />
+				Object name (optional): <input id="obj-name" />
 				
 				<br />
 				
@@ -38,11 +38,18 @@
 			<div class="settings left">
 				Map settings:
 				<p>
+					Map name: <input id="map-name" />
+					<br />
+					<button onclick="app.saveMap()">Save</button>
+					<button onclick="app.loadMap()">Load</button>
+				</p>
+				<p>
 					1 foot = <input type="number" class="coord" id="foot-to-px" value=10 />px
 					<br/>
 					<input type="number" class="coord" id="cols" min=2 value=4 /> wide by <input type="number" class="coord" id="rows" min=2 value=4 /> tall
+					<br />
+					<button onclick="app.recalcMap()">Update Map</button>
 				</p>
-				<button onclick="app.recalcMap()">Update Map</button>
 			</div>
 			<canvas id="main-map" width=200 height=200></canvas>
 			

@@ -177,7 +177,38 @@ var app = {
 		this.recalcMap();
 	},
 	
+	saveMap: function() {
+		var mapName = document.getElementById("map-name").value;
+		localStorage["map_" + mapName] = JSON.stringify(this.serialiseMapData());
+	},
+	
+	loadMap: function() {
+		var mapName = document.getElementById("map-name").value;
+		this.deserialiseMapData(JSON.parse(localStorage["map_" + mapName]));
+	},
+	
 	syncMapData: function(data) {
+		// just a pass-through for now, but might want to add extra network-specific logic eventually
+		deserialiseMapData(data);
+	},
+	
+	sendMapData: function() {
+		if (this.socket) {
+			log("Sending map info");
+			this.socket.emit("map sync", this.serialiseMapData());
+		}
+	},
+	
+	serialiseMapData: function() {
+		var data = {
+			rows: this.map.rows,
+			cols: this.map.cols,
+			objects: this.map.objects
+		};
+		return data;
+	},
+	
+	deserialiseMapData: function(data) {
 		if (data.rows) {
 			document.getElementById('rows').value = data.rows;
 		}
@@ -194,18 +225,6 @@ var app = {
 		
 		this.map.objects = objList;
 		this.recalcMap(true);
-	},
-	
-	sendMapData: function() {
-		if (this.socket) {
-			log("Sending map info");
-			var data = {
-				rows: this.map.rows,
-				cols: this.map.cols,
-				objects: this.map.objects
-			};
-			this.socket.emit("map sync", data);
-		}
 	},
 	
 	configureSocket: function(url) {
