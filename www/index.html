@@ -10,14 +10,18 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
 	</head>
 	<body ng-controller="MainCtrl">
-		<div class="networking">
+		<p>
+			Show networking: <input type="checkbox" ng-model="showNetworking" checked="checked"/> <br />
+			Show map: <input type="checkbox" ng-model="showMap" checked="checked"/> <br />
+		</p>
+		<div ng-hide="showNetworking" class="networking">
 			Host: <input id="hostname"/>
 			<button onclick="app.connect()">Connect</button>
 			<button onclick="app.download()">Download</button>
 			<button onclick="app.upload()">Upload</button>
 		</div>
 		
-		<div ng-include="'templates/map.html'"></div>
+		<div ng-hide="showMap" ng-include="'templates/map.html'"></div>
 		
 		<div class="debug">
 			Log info:
