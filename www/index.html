@@ -11,17 +11,16 @@
 	</head>
 	<body ng-controller="MainCtrl">
 		<p>
-			Show networking: <input type="checkbox" ng-model="showNetworking" checked="checked"/> <br />
-			Show map: <input type="checkbox" ng-model="showMap" checked="checked"/> <br />
+			Show: <select ng-model="shownSubpages" multiple ng-multiple="true" ng-options="page for page in subpages"></select>
 		</p>
-		<div ng-hide="showNetworking" class="networking">
+		<div ng-show="show('networking')" class="networking">
 			Host: <input id="hostname"/>
 			<button onclick="app.connect()">Connect</button>
 			<button onclick="app.download()">Download</button>
 			<button onclick="app.upload()">Upload</button>
 		</div>
 		
-		<div ng-hide="showMap" ng-include="'templates/map.html'"></div>
+		<div ng-show="show('map')" ng-include="'templates/map.html'"></div>
 		
 		<div class="debug">
 			Log info:
