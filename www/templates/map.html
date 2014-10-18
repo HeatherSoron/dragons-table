@@ -1,0 +1,47 @@
+<div class="map" ng-controller="MapCtrl">
+	<div class="add-object left">
+		Object name (optional): <input id="obj-name" />
+		
+		<br />
+		
+		x: <input type="number" class="coord" id="x-coord" min=0 value=0 />
+		y: <input type="number" class="coord" id="y-coord" min=0 value=0 />
+		
+		<br/>
+		
+		<!-- should bump up that max value, AFTER adding support for multi-cell objects (D&D/PF Large-and-larger creatures) -->
+		size: <input type="number" class="coord" id="obj-size" min=1.0 step="any" max=6.0 value=3.0 />
+		
+		<br/>
+		
+		r: <input type="number" class="color" id="red" min=0 max=255 value=0 />
+		g: <input type="number" class="color" id="green" min=0 max=255 value=0 />
+		b: <input type="number" class="color" id="blue" min=0 max=255 value=0 />
+		<br/>
+		<button onclick="app.addMapObject()">Add Map Object</button>
+	</div>
+	<div class="settings left">
+		Map settings:
+		<p>
+			Map name: <input id="map-name" />
+			<br />
+			<button onclick="app.saveMap()">Save</button>
+			<button onclick="app.loadMap()">Load</button>
+		</p>
+		<p>
+			1 foot = <input type="number" class="coord" id="foot-to-px" value=10 />px
+			<br/>
+			<input type="number" class="coord" id="cols" min=2 value=4 /> wide by <input type="number" class="coord" id="rows" min=2 value=4 /> tall
+			<br />
+			<button onclick="app.recalcMap()">Update Map</button>
+		</p>
+	</div>
+	<canvas id="main-map" width=200 height=200></canvas>
+	
+	<br />
+	
+	<select id='object-list' />
+	</select>
+	
+	<button onclick="app.removeMapObject()" >Remove Map Object</button>
+</div>

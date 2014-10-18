@@ -50,7 +50,9 @@ var app = {
 	init: function() {
 		var defaultHost = document.location.href.replace(/^http:../g,"").replace(/\/.*/g,"");
 		document.getElementById('hostname').value = defaultHost;
-		
+	},
+	
+	mapInit: function() {
 		this.canvas = document.getElementById("main-map");
 		this.map = new Map(this.canvas);
 		this.recalcMap();
