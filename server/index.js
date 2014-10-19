@@ -114,6 +114,7 @@ function onIdentify(socket,msg) {
 }
 function onDebugTest(socket,msg) {
 	socket.emit('debug test echo', msg);
+	return false;
 }
 function onMapSync(socket,msg) {
 	console.log("map sync triggered with: " + JSON.stringify(msg));
@@ -123,6 +124,7 @@ function onMapSync(socket,msg) {
 }
 function onGhost(socket,msg) {
 	socket.broadcast.emit('ghost', msg);
+	return false;
 }
 // End Handlers
 // -----------------------------------------------------------------------------
