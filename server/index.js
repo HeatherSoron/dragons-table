@@ -64,10 +64,10 @@ function getChatlogName(){
 
 	var year = d.getFullYear();
 
-	var month = d.getMonth() + 1;
+	var month = d.getMonth() + 1; // Months returned 0-based FNAR.
 	if (month < 10) { month='0'+month; }
 
-	var day = d.getDate() + 1;
+	var day = d.getDate();
 	if (day < 10) { day = '0' + day; }
 
 	var hours = d.getHours();
