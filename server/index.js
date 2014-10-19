@@ -28,14 +28,14 @@ app.post('/', function(req, res) {
 	state = req.body;
 });
 
-function addSocketHandler(socket,command,handler) {
-	socket.on(command,function(msg){
-		var ret=handler(socket,msg);
-		if(!ret)return;
-		var logOb={
-			  type:command,
-			  time:new Date()/1,
-			  data:ret
+function addSocketHandler(socket, command, handler) {
+	socket.on(command, function(msg){
+		var ret = handler(socket,msg);
+		if (!ret) { return; }
+		var logOb = {
+			  type: command,
+			  time: new Date()/1,
+			  data: ret
 		};
 
 		saveChatlog(JSON.stringify(logOb)+"\n");
@@ -52,41 +52,38 @@ io.on('connection', function(socket) {
 });
 
 var CHATLOG_NAME=null;
-function saveChatlog(str)
-{
+function saveChatlog(str){
 	fs.appendFileSync(getChatlogName(),str);
 }
-function getChatlogName()
-{
-	if(CHATLOG_NAME)return CHATLOG_NAME;
+function getChatlogName(){
+	if (CHATLOG_NAME) { return CHATLOG_NAME; }
 
 	// Final format is chatlogs/name yyyy-mm-dd hh_mm_ss.log
 	// Using underscores in time because : is reserved on mac
-	var d=new Date();
+	var d = new Date();
 
-	var year=d.getFullYear();
+	var year = d.getFullYear();
 
-	var month=d.getMonth()+1;
-	if(month<10)month='0'+month;
+	var month = d.getMonth() + 1; // Months returned 0-based FNAR.
+	if (month < 10) { month='0'+month; }
 
-	var day=d.getDate()+1;
-	if(day<10)day='0'+day;
+	var day = d.getDate();
+	if (day < 10) { day = '0' + day; }
 
-	var hours=d.getHours();
-	if(hours<10)hours='0'+hours;
+	var hours = d.getHours();
+	if (hours < 10) { hours = '0' + hours; }
 
-	var minutes=d.getMinutes();
-	if(minutes<10)minutes='0'+minutes;
+	var minutes = d.getMinutes();
+	if (minutes < 10) { minutes = '0' + minutes; }
 
-	var seconds=d.getSeconds();
-	if(seconds<10)seconds='0'+seconds;
+	var seconds = d.getSeconds();
+	if (seconds < 10) { seconds = '0' + seconds; }
 
 	try{
 		fs.mkdirSync("chatlogs");
-	}catch(e)
-	{
-		if(e.code!='EEXIST') // EEXIST is ok
-		{
+	} catch(e) {
+		// EEXIST is ok
+		if (e.code != 'EEXIST') {
 			console.error(e);
 		}
 	}
