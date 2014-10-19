@@ -103,6 +103,7 @@ function onIdentify(socket,msg) {
 
 		addSocketHandler(socket,'map sync',onMapSync);
 		addSocketHandler(socket,'ghost',onGhost);
+		addSocketHandler(socket,'chat',onChat);
 	} else {
 		socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
 		console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
@@ -122,6 +123,12 @@ function onMapSync(socket,msg) {
 function onGhost(socket,msg) {
 	socket.broadcast.emit('ghost', msg);
 	return false;
+}
+function onChat(socket,msg) {
+	// TODO: Do SO MUCH MORE here.
+	socket.broadcast.emit('chat', msg);
+	socket.emit('chat', msg);
+	return msg;
 }
 // End Handlers
 // -----------------------------------------------------------------------------

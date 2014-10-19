@@ -251,6 +251,7 @@ var app = {
 			app.map.objects[msg.id].ghost = msg.position;
 			app.map.redraw();
 		});
+		this.socket.on('chat',onChat);
 	},
 	
 	connect: function() {
