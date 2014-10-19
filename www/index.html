@@ -7,6 +7,13 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css" />
 	</head>
 	<body onload="init()">
+		<div id='chat'>
+			<div id='chat-scroll'></div>
+			<div id='chat-input'>
+				<textarea id='chat-text'></textarea>
+			</div>
+		</div>
+
 		<div class="networking">
 			Host: <input id="hostname"/>
 			<button onclick="app.connect()">Connect</button>

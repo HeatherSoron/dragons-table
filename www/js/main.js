@@ -6,6 +6,8 @@ function init() {
 	log("Application initialized");
 	
 	app.init();
+
+	initChatLog();
 }
 
 function log(msg) {
@@ -251,6 +253,7 @@ var app = {
 			app.map.objects[msg.id].ghost = msg.position;
 			app.map.redraw();
 		});
+		document.getElementById('chat').style.display='block';
 		this.socket.on('chat',onChat);
 	},
 	
