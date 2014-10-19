@@ -46,9 +46,15 @@ io.on('connection', function(socket) {
 	console.log('WebSockets connection started');
 	addSocketHandler(socket,'identify',onIdentify);
 	addSocketHandler(socket,'debug test',onDebugTest);
-	if (!socket.identified) {
+	var interval=setInterval(function(){
+		if (socket.disconnected || socket.identified)
+		{
+			clearTimeout(interval);
+			return;
+		}
+		console.log("Requesting re-identification...");
 		socket.emit('re-identify');
-	}
+	},1000);
 });
 
 var CHATLOG_NAME=null;
@@ -95,8 +101,10 @@ function getChatlogName(){
 // -----------------------------------------------------------------------------
 // Handlers
 function onIdentify(socket,msg) {
+	if (socket.identified) { return; } // DO NOT allow multiple identifies, that way lies madness.
+	socket.identified = true; // Ensure that this is set as early as possible to mitigate potential races
+
 	console.log("connection identified as: " + JSON.stringify(msg));
-	socket.identified = true;
 
 	if (validVersion(msg.version)) {
 		socket.emit('map sync', state);
