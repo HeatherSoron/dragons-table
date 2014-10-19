@@ -189,7 +189,7 @@ var app = {
 	
 	syncMapData: function(data) {
 		// just a pass-through for now, but might want to add extra network-specific logic eventually
-		deserialiseMapData(data);
+		this.deserialiseMapData(data);
 	},
 	
 	sendMapData: function() {
