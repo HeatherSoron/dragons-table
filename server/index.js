@@ -60,7 +60,7 @@ function getChatlogName()
 {
 	if(CHATLOG_NAME)return CHATLOG_NAME;
 
-	// Final format is Chatlogs/name yyyy-mm-dd hh_mm_ss.log
+	// Final format is chatlogs/name yyyy-mm-dd hh_mm_ss.log
 	// Using underscores in time because : is reserved on mac
 	var d=new Date();
 
@@ -82,7 +82,7 @@ function getChatlogName()
 	if(seconds<10)seconds='0'+seconds;
 
 	try{
-		fs.mkdirSync("Chatlogs");
+		fs.mkdirSync("chatlogs");
 	}catch(e)
 	{
 		if(e.code!='EEXIST') // EEXIST is ok
@@ -90,7 +90,7 @@ function getChatlogName()
 			console.error(e);
 		}
 	}
-	CHATLOG_NAME="Chatlogs/Chatlog "+year+"-"+month+"-"+day+" "+hours+"_"+minutes+"_"+seconds+".log";
+	CHATLOG_NAME="chatlogs/chatlog "+year+"-"+month+"-"+day+" "+hours+"_"+minutes+"_"+seconds+".log";
 	return CHATLOG_NAME;
 }
 
