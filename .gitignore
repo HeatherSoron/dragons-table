@@ -1,2 +1,6 @@
 # don't really need the whole build directory
 platforms
+.DS_Store
+/node_modules
+*.patch
+/chatlogs
