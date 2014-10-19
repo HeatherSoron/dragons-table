@@ -26,36 +26,51 @@ app.post('/', function(req, res) {
 	state = req.body;
 });
 
+function addSocketHandler(socket,command,handler) {
+	socket.on(command,function(msg){
+		handler(socket,msg); // TODO: Handle chat log here
+	});
+}
+
 io.on('connection', function(socket) {
 	console.log('WebSockets connection started');
-	socket.on('identify', function(msg) {
-		console.log("connection identified as: " + JSON.stringify(msg));
-		socket.identified = true;
-		
-		if (validVersion(msg.version)) {
-			socket.emit('map sync', state);
-			
-			socket.on('map sync', function(msg) {
-				console.log("map sync triggered with: " + JSON.stringify(msg));
-				state = msg;
-				socket.broadcast.emit('map sync', msg);
-			});
-			
-			socket.on('ghost', function(msg) {
-				socket.broadcast.emit('ghost', msg);
-			});
-		} else {
-			socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
-			console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
-		}
-	});
-	socket.on('debug test', function(msg) {
-		socket.emit('debug test echo', msg);
-	});
+	addSocketHandler(socket,'identify',onIdentify);
+	addSocketHandler(socket,'debug test',onDebugTest);
 	if (!socket.identified) {
 		socket.emit('re-identify');
 	}
 });
+
+
+// -----------------------------------------------------------------------------
+// Handlers
+function onIdentify(socket,msg) {
+	console.log("connection identified as: " + JSON.stringify(msg));
+	socket.identified = true;
+
+	if (validVersion(msg.version)) {
+		socket.emit('map sync', state);
+
+		addSocketHandler(socket,'map sync',onMapSync);
+		addSocketHandler(socket,'ghost',onGhost);
+	} else {
+		socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
+		console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
+	}
+}
+function onDebugTest(socket,msg) {
+	socket.emit('debug test echo', msg);
+}
+function onMapSync(socket,msg) {
+	console.log("map sync triggered with: " + JSON.stringify(msg));
+	state = msg;
+	socket.broadcast.emit('map sync', msg);
+}
+function onGhost(socket,msg) {
+	socket.broadcast.emit('ghost', msg);
+}
+// End Handlers
+// -----------------------------------------------------------------------------
 
 http.listen(3000, function(){
 	console.log('listening on *:3000');
