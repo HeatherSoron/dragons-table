@@ -147,6 +147,10 @@ function onGhost(socket,msg) {
 }
 function onChat(socket,msg) {
 	// TODO: Do SO MUCH MORE here.
+	var n="Unidentified Player";
+	if(socket.playerData && socket.playerData.username)
+		n=socket.playerData.username;
+	msg.from=n;
 	socket.broadcast.emit('chat', msg);
 	socket.emit('chat', msg);
 	return msg;

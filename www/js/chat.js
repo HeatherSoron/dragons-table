@@ -6,7 +6,7 @@ function appendAndScroll(el) {
 function onChat(msg) {
 	var d=document.createElement('div');
 	d.className='chat-message';
-	d.innerHTML=msg.data;
+	d.innerHTML="<span class='username'>"+msg.from+":</span> (( "+msg.data+" ))";
 	appendAndScroll(d);
 }
 function addChatInformationalMessage(msg) {
