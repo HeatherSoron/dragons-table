@@ -6,7 +6,7 @@ function appendAndScroll(el) {
 function onChat(msg) {
 	var d=document.createElement('div');
 	d.className='chat-message';
-	d.innerHTML="<span class='username'>"+msg.from+":</span> (( "+msg.data+" ))";
+	d.innerHTML="<span class='username' title='"+new Date(msg.time)+"'>"+msg.from+":</span> (( "+msg.data+" ))";
 	appendAndScroll(d);
 }
 function addChatInformationalMessage(msg) {
@@ -28,7 +28,7 @@ function initChatLog() {
 
 function handleChatMessage(evt,chat) {
 	// TODO: Check for option or something to insert a literal newline.
-	app.socket.emit('chat',{type:'chat',data:chat.value});
+	app.socket.emit('chat',{type:'chat',data:chat.value,time:new Date()/1});
 	chat.value=''
 	evt.preventDefault();
 }
