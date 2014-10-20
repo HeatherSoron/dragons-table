@@ -56,3 +56,13 @@ body {
 	padding:3px;
 	border-bottom:1px solid lightgray;
 }
+#chat > #chat-scroll > .chat-info {
+	width:100%;
+	text-align:center;
+	font-weight:700;
+	color:gray;
+	font-size:small;
+	font-style:italic;
+	padding:3px;
+	border-bottom:1px solid lightgray;
+}

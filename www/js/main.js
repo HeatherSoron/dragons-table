@@ -231,6 +231,22 @@ var app = {
 	
 	configureSocket: function(url) {
 		this.socket = io(url);
+
+		addChatInformationalMessage("You have connected.");
+
+		var un=document.getElementById('username');
+		if(!un.value)
+		{
+			alert("Plese enter a user-name");
+			un.focus();
+			return;
+		}
+		un.disabled=true;
+		document.getElementById('hostname').disabled=true;
+		var b=document.getElementById('connect-button');
+		b.onclick=function(){app.disconnect()};
+		b.innerHTML='Disconnect';
+
 		log("WebSockets connect: " + url);
 		this.socket.on("map sync", function(msg) {
 			app.syncMapData(msg);
@@ -242,6 +258,7 @@ var app = {
 		
 		var identification = {
 			version: CLIENT_VERSION,
+			username: document.getElementById('username').value
 		};
 		
 		this.socket.emit('identify', identification);
@@ -252,6 +269,15 @@ var app = {
 		this.socket.on('ghost', function(msg) {
 			app.map.objects[msg.id].ghost = msg.position;
 			app.map.redraw();
+		});
+
+		this.socket.on('players connected',function(msg) {
+			for(var i=0;i<msg.length;++i) {
+				addChatInformationalMessage(msg[i]+" has connected.");
+			}
+	    });
+		this.socket.on('player disconnected',function(msg) {
+			addChatInformationalMessage(msg+" has disconnected.");
 		});
 		document.getElementById('chat').style.display='block';
 		this.socket.on('chat',onChat);
@@ -269,6 +295,18 @@ var app = {
 		
 		var x = document.getElementsByTagName('script')[0];
 		x.parentNode.insertBefore(s, x);
+	},
+
+	disconnect: function() {
+		this.socket.disconnect();
+		this.socket=null;
+
+		document.getElementById('username').disabled=false;
+		document.getElementById('hostname').disabled=false;
+		var b=document.getElementById('connect-button');
+		b.onclick=function(){app.connect()}
+		b.innerHTML='Connect';
+		addChatInformationalMessage("You have disconnected.");
 	},
 	
 	download: function() {

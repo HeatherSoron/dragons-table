@@ -1,10 +1,19 @@
+function appendAndScroll(el) {
+	var e=document.getElementById('chat-scroll');
+	e.appendChild(el);
+	e.scrollTop = e.scrollHeight
+}
 function onChat(msg) {
 	var d=document.createElement('div');
 	d.className='chat-message';
 	d.innerHTML=msg.data;
-	var el=document.getElementById('chat-scroll');
-	el.appendChild(d);
-	el.scrollTop = el.scrollHeight
+	appendAndScroll(d);
+}
+function addChatInformationalMessage(msg) {
+	var d=document.createElement('div');
+	d.className='chat-info';
+	d.innerHTML=msg;
+	appendAndScroll(d);
 }
 
 function initChatLog() {
@@ -23,3 +32,4 @@ function handleChatMessage(evt,chat) {
 	chat.value=''
 	evt.preventDefault();
 }
+

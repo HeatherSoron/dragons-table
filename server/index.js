@@ -43,9 +43,11 @@ function addSocketHandler(socket, command, handler) {
 }
 
 io.on('connection', function(socket) {
+	socket.playerData={};
 	console.log('WebSockets connection started');
 	addSocketHandler(socket,'identify',onIdentify);
 	addSocketHandler(socket,'debug test',onDebugTest);
+	addSocketHandler(socket,'disconnect',onDisconnect);
 	var interval=setInterval(function(){
 		if (socket.disconnected || socket.identified)
 		{
@@ -108,6 +110,17 @@ function onIdentify(socket,msg) {
 
 	if (validVersion(msg.version)) {
 		socket.emit('map sync', state);
+		socket.playerData.username=msg.username;
+		socket.broadcast.emit('players connected',[msg.username]);
+		var others=[];
+		for(var i=0;i<io.sockets.sockets.length;++i) {
+			if(io.sockets.sockets[i]!=socket && io.sockets.sockets[i].identified && !io.sockets.sockets[i].disconnected) {
+				others.push(io.sockets.sockets[i].playerData.username);
+			}
+		}
+		if(others.length) {
+			socket.emit('players connected',others);
+		}
 
 		addSocketHandler(socket,'map sync',onMapSync);
 		addSocketHandler(socket,'ghost',onGhost);
@@ -137,6 +150,11 @@ function onChat(socket,msg) {
 	socket.broadcast.emit('chat', msg);
 	socket.emit('chat', msg);
 	return msg;
+}
+function onDisconnect(socket,msg) {
+	socket.broadcast.emit('player disconnected',socket.playerData.username);
+	console.log("WebSocket disconnceted for "+socket.playerData.username);
+	return {username:socket.playerData.username}
 }
 // End Handlers
 // -----------------------------------------------------------------------------
