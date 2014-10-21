@@ -248,10 +248,6 @@ var app = {
 			username: document.getElementById('username').value
 		};
 
-		this.socket.on('re-identify', function(msg) {
-			app.socket.emit('identify', identification);
-		});
-
 		this.socket.on('invalid player name',function(msg) {
 			alert("Could not connect as "+msg.name+". Reason: "+msg.reason+".");
 			setupButtonsDisonnected();

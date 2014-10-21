@@ -49,15 +49,6 @@ io.on('connection', function(socket) {
 	addSocketHandler(socket,'identify',onIdentify);
 	addSocketHandler(socket,'debug test',onDebugTest);
 	addSocketHandler(socket,'disconnect',onDisconnect);
-	var interval=setInterval(function(){
-		if (socket.disconnected || socket.identified)
-		{
-			clearTimeout(interval);
-			return;
-		}
-		console.log("Requesting re-identification...");
-		socket.emit('re-identify');
-	},1000);
 });
 
 var CHATLOG_NAME=null;
