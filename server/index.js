@@ -6,6 +6,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 var names = require('../www/js/shared/names.js');
+var hardener = require('../www/js/shared/validate.js');
 
 var state = {
 	objects: [],
@@ -29,8 +30,15 @@ app.post('/', function(req, res) {
 	state = req.body;
 });
 
-function addSocketHandler(socket, command, handler) {
+function addSocketHandler(socket, command, handler,prototypicalObject) {
+	if( !prototypicalObject ) {
+		console.warn("Notice: API command \""+command+"\" accepts arbitrary data. This may or may not be acceptable.");
+	}
 	socket.on(command, function(msg){
+		if (prototypicalObject && !hardener.validateAPIObject(prototypicalObject,msg)) {
+			socket.emit('invalid command',{command:command,message:msg});
+			return
+		}
 		var ret = handler(socket,msg);
 		if (!ret) { return; }
 		var logOb = {
@@ -46,9 +54,9 @@ function addSocketHandler(socket, command, handler) {
 io.on('connection', function(socket) {
 	socket.playerData={};
 	console.log('WebSockets connection started');
-	addSocketHandler(socket,'identify',onIdentify);
-	addSocketHandler(socket,'debug test',onDebugTest);
-	addSocketHandler(socket,'disconnect',onDisconnect);
+	addSocketHandler(socket,'identify',onIdentify,{version:"",username:""});
+	addSocketHandler(socket,'debug test',onDebugTest,null); // accept anything
+	addSocketHandler(socket,'disconnect',onDisconnect,null); // not a real message, accept anything
 });
 
 var CHATLOG_NAME=null;
@@ -148,9 +156,9 @@ function onIdentify(socket,msg) {
 			socket.emit('players connected',others);
 		}
 
-		addSocketHandler(socket,'map sync',onMapSync);
-		addSocketHandler(socket,'ghost',onGhost);
-		addSocketHandler(socket,'chat',onChat);
+		addSocketHandler(socket,'map sync',onMapSync,{rows:0,cols:0,objects:[{color:"",feet:0,name:"",x:0,y:0}]});
+		addSocketHandler(socket,'ghost',onGhost,{id:0,position:{x:0,y:0}});
+		addSocketHandler(socket,'chat',onChat,{type:"",data:"",time:0});
 	} else {
 		socket.emit('invalid version',{required:minClientVersion,yours:msg.version});
 		console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));

@@ -250,6 +250,10 @@ var app = {
 		this.socket.on('invalid version',function(msg){
 			alert("Update your client.\n\nYour version: " + msg.yours + '\nMinimum version: ' + msg.required);
 		});
+		this.socket.on('invalid command',function(msg) {
+			console.error("Invalid command detected!");
+			console.dir(msg);
+		});
 		this.socket.on('invalid player name',function(msg) {
 			alert("Could not connect as "+msg.name+". Reason: "+msg.reason+".");
 			setupButtonsDisonnected();
