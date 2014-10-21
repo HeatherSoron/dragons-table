@@ -6,7 +6,12 @@ function appendAndScroll(el) {
 function onChat(msg) {
 	var d=document.createElement('div');
 	d.className='chat-message';
-	d.innerHTML="<span class='username' title='"+new Date(msg.time)+"'>"+msg.from+":</span> (( "+msg.data+" ))";
+	var s;
+	if(KNOWN_PLAYERS[msg.from])
+		s=KNOWN_PLAYERS[msg.from].HTML
+	else
+		s="Unidentified Player";
+	d.innerHTML="<span class='username' title='"+new Date(msg.time)+"'>"+s+":</span> (( "+msg.data+" ))";
 	appendAndScroll(d);
 }
 function addChatInformationalMessage(msg) {

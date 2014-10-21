@@ -18,6 +18,8 @@ function log(msg) {
 	elem.innerHTML = msg + "\n" + elem.innerHTML;
 }
 
+var KNOWN_PLAYERS={};
+
 // taken from StackOverflow, because I don't feel like grabbing jQuery *yet*: http://stackoverflow.com/a/442474
 function getElemCoords(el) {
 	var _x = 0;
@@ -228,7 +230,7 @@ var app = {
 		this.map.objects = objList;
 		this.recalcMap(true);
 	},
-	
+
 	configureSocket: function(url) {
 		this.socket = io(url);
 
@@ -241,6 +243,8 @@ var app = {
 			un.focus();
 			return;
 		}
+		var n=createName(un.value)
+		KNOWN_PLAYERS[n.canonical]=n
 		un.disabled=true;
 		document.getElementById('hostname').disabled=true;
 		var b=document.getElementById('connect-button');
@@ -273,11 +277,17 @@ var app = {
 
 		this.socket.on('players connected',function(msg) {
 			for(var i=0;i<msg.length;++i) {
-				addChatInformationalMessage(msg[i]+" has connected.");
+				KNOWN_PLAYERS[msg[i].canonical]=msg[i];
+				addChatInformationalMessage(msg[i].HTML+" has connected.");
 			}
 	    });
 		this.socket.on('player disconnected',function(msg) {
-			addChatInformationalMessage(msg+" has disconnected.");
+			if(!KNOWN_PLAYERS[msg]) {
+				addChatInformationalMessage("Unidentified Player has disconnected.");
+			} else {
+				addChatInformationalMessage(KNOWN_PLAYERS[msg].HTML+" has disconnected.");
+				delete KNOWN_PLAYERS[msg];
+			}
 		});
 		document.getElementById('chat').style.display='block';
 		this.socket.on('chat',onChat);

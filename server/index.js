@@ -5,6 +5,7 @@ var cors = require('cors');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
+var names = require('../www/js/shared/names.js');
 
 var state = {
 	objects: [],
@@ -109,9 +110,14 @@ function onIdentify(socket,msg) {
 	console.log("connection identified as: " + JSON.stringify(msg));
 
 	if (validVersion(msg.version)) {
+		var n=names.createName(msg.username);
+		if(!n) {
+			socket.emit('invalid player name',msg.username);
+		}
+
 		socket.emit('map sync', state);
-		socket.playerData.username=msg.username;
-		socket.broadcast.emit('players connected',[msg.username]);
+		socket.playerData.username=n;
+		socket.broadcast.emit('players connected',[n]);
 		var others=[];
 		for(var i=0;i<io.sockets.sockets.length;++i) {
 			if(io.sockets.sockets[i]!=socket && io.sockets.sockets[i].identified && !io.sockets.sockets[i].disconnected) {
@@ -148,17 +154,22 @@ function onGhost(socket,msg) {
 function onChat(socket,msg) {
 	// TODO: Do SO MUCH MORE here.
 	var n="Unidentified Player";
-	if(socket.playerData && socket.playerData.username)
-		n=socket.playerData.username;
+	if(socket.playerData && socket.playerData.username) {
+		n=socket.playerData.username.canonical;
+	}
 	msg.from=n;
 	socket.broadcast.emit('chat', msg);
 	socket.emit('chat', msg);
 	return msg;
 }
 function onDisconnect(socket,msg) {
-	socket.broadcast.emit('player disconnected',socket.playerData.username);
-	console.log("WebSocket disconnceted for "+socket.playerData.username);
-	return {username:socket.playerData.username}
+	var n="Unidentified Player";
+	if(socket.playerData && socket.playerData.username) {
+		n=socket.playerData.username.canonical;
+	}
+	socket.broadcast.emit('player disconnected',n);
+	console.log("WebSocket disconnceted for "+n);
+	return {username:n}
 }
 // End Handlers
 // -----------------------------------------------------------------------------
