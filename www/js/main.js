@@ -231,31 +231,14 @@ var app = {
 		this.recalcMap(true);
 	},
 
-	configureSocket: function(url) {
+	configureSocket: function(url,n) {
 		this.socket = io(url);
 
-		addChatInformationalMessage("You have connected.");
-
-		var un=document.getElementById('username');
-		if(!un.value)
-		{
-			alert("Plese enter a user-name");
-			un.focus();
-			return;
-		}
-		var n=createName(un.value)
-		KNOWN_PLAYERS[n.canonical]=n
-		un.disabled=true;
-		document.getElementById('hostname').disabled=true;
-		var b=document.getElementById('connect-button');
-		b.onclick=function(){app.disconnect()};
-		b.innerHTML='Disconnect';
+		setupButtonsConnected();
 
 		log("WebSockets connect: " + url);
-		this.socket.on("map sync", function(msg) {
-			app.syncMapData(msg);
-		});
-		
+
+		// At this point, we are only connected AT THE SOCKET LEVEL.
 		this.socket.on('alert', function(msg) {
 			alert(msg);
 		});
@@ -264,36 +247,71 @@ var app = {
 			version: CLIENT_VERSION,
 			username: document.getElementById('username').value
 		};
-		
-		this.socket.emit('identify', identification);
+
 		this.socket.on('re-identify', function(msg) {
 			app.socket.emit('identify', identification);
 		});
-		
-		this.socket.on('ghost', function(msg) {
-			app.map.objects[msg.id].ghost = msg.position;
-			app.map.redraw();
+
+		this.socket.on('invalid player name',function(msg) {
+			alert("Could not connect as "+msg.name+". Reason: "+msg.reason+".");
+			setupButtonsDisonnected();
+			socket.disconnect();
+		});
+		var _socket=this.socket; // need this for closure
+		this.socket.on('name accepted',function(msg) {
+			// THIS means that the server accepts us
+			log("Name accepted: " + n.canonical);
+			addChatInformationalMessage("You have connected as "+n.HTML);
+			KNOWN_PLAYERS[n.canonical]=n;
+
+			_socket.on("map sync", function(msg) {
+				app.syncMapData(msg);
+			});
+
+			_socket.on('ghost', function(msg) {
+				app.map.objects[msg.id].ghost = msg.position;
+				app.map.redraw();
+			});
+
+			_socket.on('players connected',function(msg) {
+				for(var i=0;i<msg.length;++i) {
+					KNOWN_PLAYERS[msg[i].canonical]=msg[i];
+					addChatInformationalMessage(msg[i].HTML+" has connected.");
+				}
+			});
+			_socket.on('player disconnected',function(msg) {
+				if(!KNOWN_PLAYERS[msg]) {
+					addChatInformationalMessage("Unidentified Player has disconnected.");
+				} else {
+					addChatInformationalMessage(KNOWN_PLAYERS[msg].HTML+" has disconnected.");
+					delete KNOWN_PLAYERS[msg];
+				}
+			});
+			document.getElementById('chat').style.display='block';
+			_socket.on('chat',onChat);
+
 		});
 
-		this.socket.on('players connected',function(msg) {
-			for(var i=0;i<msg.length;++i) {
-				KNOWN_PLAYERS[msg[i].canonical]=msg[i];
-				addChatInformationalMessage(msg[i].HTML+" has connected.");
-			}
-	    });
-		this.socket.on('player disconnected',function(msg) {
-			if(!KNOWN_PLAYERS[msg]) {
-				addChatInformationalMessage("Unidentified Player has disconnected.");
-			} else {
-				addChatInformationalMessage(KNOWN_PLAYERS[msg].HTML+" has disconnected.");
-				delete KNOWN_PLAYERS[msg];
-			}
-		});
-		document.getElementById('chat').style.display='block';
-		this.socket.on('chat',onChat);
+		this.socket.emit('identify', identification);
 	},
 	
 	connect: function() {
+		// Check the username before doing anything
+		var un=document.getElementById('username');
+		if(!un.value)
+		{
+			alert("Plese enter a user-name");
+			un.focus();
+			return;
+		}
+		var n=createName(un.value)
+		if(!n) {
+			alert("Username contains invalid characters");
+			un.focus();
+			return;
+		}
+
+
 		var hostUrl = this.getHostUrl();
 		// script-loading taken from http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
 		var s = document.createElement('script');
@@ -301,7 +319,8 @@ var app = {
 		s.async = true;
 		s.src = hostUrl + 'socket.io/socket.io.js';
 
-		s.addEventListener('load', function() { app.configureSocket(hostUrl); });
+		s.addEventListener('load', function() { app.configureSocket(hostUrl,n); });
+		s.addEventListener('error', function() { alert("Could not connect to server") });
 		
 		var x = document.getElementsByTagName('script')[0];
 		x.parentNode.insertBefore(s, x);
@@ -311,11 +330,7 @@ var app = {
 		this.socket.disconnect();
 		this.socket=null;
 
-		document.getElementById('username').disabled=false;
-		document.getElementById('hostname').disabled=false;
-		var b=document.getElementById('connect-button');
-		b.onclick=function(){app.connect()}
-		b.innerHTML='Connect';
+		setupButtonsDisonnected();
 		addChatInformationalMessage("You have disconnected.");
 	},
 	
@@ -342,3 +357,24 @@ var app = {
 		return 'http://' + hostname + '/';
 	},
 };
+
+
+function setupButtonsConnected(){
+	document.getElementById('username').disabled=true;
+	document.getElementById('hostname').disabled=true;
+	document.getElementById('download-button').disabled=false;
+	document.getElementById('upload-button').disabled=false;
+	var b=document.getElementById('connect-button');
+	b.onclick=function(){app.disconnect()}
+	b.innerHTML='Disconnect';
+}
+function setupButtonsDisonnected(){
+	document.getElementById('username').disabled=false;
+	document.getElementById('hostname').disabled=false;
+	document.getElementById('download-button').disabled=true;
+	document.getElementById('upload-button').disabled=true;
+	var b=document.getElementById('connect-button');
+	b.onclick=function(){app.connect()}
+	b.innerHTML='Connect';
+}
+

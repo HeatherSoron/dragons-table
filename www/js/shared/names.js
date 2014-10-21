@@ -52,16 +52,10 @@ var namesInternal={
 		// 1) String must have at least 1 non-whitespace character
 		if (str.length==0) { return false; }
 
-		// 2) Must not be a reserved name
-		var l=str.toLowerCase();
-		for(var i=0;i<namesInternal.reservedNames.length;++i)
-			if(namesInternal.reservedNames[i].regex.test(l))
-				return false;
-
-		// 3) Check for disallowed ASCII
+		// 2) Check for disallowed ASCII
 		if ( /[\u0000-\u001F\u007F<>&\\,;]/.test(str) ) { return false; }
 
-		// 4) Check for whitelisted unicode
+		// 3) Check for whitelisted unicode
 		//    Easiest way I can think of is to replace the allowable unicode with the empty string and then check for anything higher than 0x7F
 		//    Probably not the fastest method, sadly.
 
@@ -89,17 +83,8 @@ var namesInternal={
 	whitelistedUnicode:[],
 	whitelistUnicode:function(unicode,html,ascii) {
 		this.whitelistedUnicode.push({unicode:unicode,html:html,ascii:ascii});
-	},
-	reservedNames:[],
-	reserveName:function(reg,canWhisper) {
-		this.reservedNames.push({regex:reg,whisper:canWhisper});
 	}
-
-
 };
-// RESERVED NAMES:        RegExp                        , can whisper to
-namesInternal.reserveName(/^unidentified player [0-9]+$/, false); // reserved for unidentified connections
-
 // WHITELISTED UNICODE CHARACTERS
 // There are numerous ways that using unicode characters can cause us problems.
 //     Visually similar or even identical letter forms (full-width latin characters, combining diacriticals, etc)
