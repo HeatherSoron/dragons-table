@@ -1,6 +1,6 @@
 var DEBUG_MODE = true;
 
-var CLIENT_VERSION = '0.3.1';
+var CLIENT_VERSION = '0.3.2';
 
 function init() {
 	log("Application initialized");
@@ -247,7 +247,9 @@ var app = {
 			version: CLIENT_VERSION,
 			username: document.getElementById('username').value
 		};
-
+		this.socket.on('invalid version',function(msg){
+			alert("Update your client.\n\nYour version: " + msg.yours + '\nMinimum version: ' + msg.required);
+		});
 		this.socket.on('invalid player name',function(msg) {
 			alert("Could not connect as "+msg.name+". Reason: "+msg.reason+".");
 			setupButtonsDisonnected();

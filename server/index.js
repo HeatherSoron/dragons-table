@@ -11,7 +11,7 @@ var state = {
 	objects: [],
 };
 
-var minClientVersion = '0.3.0';
+var minClientVersion = '0.3.2';
 
 
 app.use(bodyParser.json());
@@ -152,7 +152,7 @@ function onIdentify(socket,msg) {
 		addSocketHandler(socket,'ghost',onGhost);
 		addSocketHandler(socket,'chat',onChat);
 	} else {
-		socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
+		socket.emit('invalid version',{required:minClientVersion,yours:msg.version});
 		console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
 	}
 	return msg;
