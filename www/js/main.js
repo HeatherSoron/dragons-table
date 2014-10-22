@@ -255,8 +255,7 @@ var app = {
 		addSocketHandler(this.socket,'alert',function(socket,msg){alert(msg)},"");
 		addSocketHandler(this.socket,'server disconnected',function(socket,msg){
 			alert("Server disconnected. "+msg);
-			setupButtonsDisonnected();
-			socket.disconnect();
+			app.disconnect();
 		},"");
 
 		var identification = {
@@ -353,6 +352,7 @@ var app = {
 
 		setupButtonsDisonnected();
 		addChatInformationalMessage("You have disconnected.");
+		KNOWN_PLAYERS={}
 	},
 	
 	download: function() {
