@@ -10,6 +10,8 @@ var hardener = require('../www/js/shared/validate.js');
 
 var state = {
 	objects: [],
+	rows:4,
+	cols:4
 };
 
 var minClientVersion = '0.3.2';
@@ -31,11 +33,11 @@ app.post('/', function(req, res) {
 });
 
 function addSocketHandler(socket, command, handler,prototypicalObject) {
-	if( !prototypicalObject ) {
+	if( prototypicalObject===null ) {
 		console.warn("Notice: API command \""+command+"\" accepts arbitrary data. This may or may not be acceptable.");
 	}
 	socket.on(command, function(msg){
-		if (prototypicalObject && !hardener.validateAPIObject(prototypicalObject,msg)) {
+		if (prototypicalObject!==null && !hardener.validateAPIObject(prototypicalObject,msg)) {
 			socket.emit('invalid command',{command:command,message:msg});
 			return
 		}

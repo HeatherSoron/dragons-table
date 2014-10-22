@@ -20,6 +20,20 @@ function log(msg) {
 
 var KNOWN_PLAYERS={};
 
+function addSocketHandler(socket, command, handler,prototypicalObject) {
+	if( prototypicalObject===null ) {
+		console.warn("Notice: API command \""+command+"\" accepts arbitrary data. This may or may not be acceptable.");
+	}
+	socket.on(command, function(msg){
+		if (prototypicalObject!==null && !validateAPIObject(prototypicalObject,msg)) {
+			console.error("Invalid command (\""+command+"\") detected from server!");
+			console.dir(msg);
+			return
+		}
+		handler(socket,msg);
+	});
+}
+
 // taken from StackOverflow, because I don't feel like grabbing jQuery *yet*: http://stackoverflow.com/a/442474
 function getElemCoords(el) {
 	var _x = 0;
@@ -137,8 +151,7 @@ var app = {
 		
 		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 		
-		var obj = new Drawable(x, y, color, size);
-		obj.name = document.getElementById("obj-name").value;
+		var obj = new Drawable(x, y, color, size, document.getElementById("obj-name").value);
 		
 		this.map.addObject(obj);
 		
@@ -223,7 +236,7 @@ var app = {
 		var objList = data.objects;
 		for (var i = 0; i < objList.length; ++i) {
 			var obj = objList[i];
-			objList[i] = new Drawable(obj.x, obj.y, obj.color);
+			objList[i] = new Drawable(obj.x, obj.y, obj.color, obj.size, obj.name);
 			objList[i].feet = obj.feet;
 		}
 		
@@ -239,60 +252,61 @@ var app = {
 		log("WebSockets connect: " + url);
 
 		// At this point, we are only connected AT THE SOCKET LEVEL.
-		this.socket.on('alert', function(msg) {
-			alert(msg);
-		});
-		
+		addSocketHandler(this.socket,'alert',function(socket,msg){alert(msg)},"");
+
 		var identification = {
 			version: CLIENT_VERSION,
 			username: document.getElementById('username').value
 		};
-		this.socket.on('invalid version',function(msg){
+		addSocketHandler(this.socket,'invalid version',function(socket,msg){
 			alert("Update your client.\n\nYour version: " + msg.yours + '\nMinimum version: ' + msg.required);
-		});
-		this.socket.on('invalid command',function(msg) {
-			console.error("Invalid command detected!");
+		},{yours:"",required:""});
+
+		addSocketHandler(this.socket,'invalid command',function(socket,msg) {
+			console.error("Invalid command sent to server!");
 			console.dir(msg);
-		});
-		this.socket.on('invalid player name',function(msg) {
+		},null);
+
+		addSocketHandler(this.socket,'invalid player name',function(socket,msg) {
 			alert("Could not connect as "+msg.name+". Reason: "+msg.reason+".");
 			setupButtonsDisonnected();
 			socket.disconnect();
-		});
-		var _socket=this.socket; // need this for closure
-		this.socket.on('name accepted',function(msg) {
+		},{name:"",reason:""});
+
+		addSocketHandler(this.socket,'name accepted',function(socket,msg) {
 			// THIS means that the server accepts us
 			log("Name accepted: " + n.canonical);
 			addChatInformationalMessage("You have connected as "+n.HTML);
 			KNOWN_PLAYERS[n.canonical]=n;
 
-			_socket.on("map sync", function(msg) {
+			addSocketHandler(socket,'map sync',function(socket,msg) {
 				app.syncMapData(msg);
-			});
+			},{rows:0,cols:0,objects:[{color:"",feet:0,name:"",x:0,y:0}]});
 
-			_socket.on('ghost', function(msg) {
+			addSocketHandler(socket,'ghost',function(socket,msg) {
 				app.map.objects[msg.id].ghost = msg.position;
 				app.map.redraw();
-			});
+			},{id:0,position:{x:0,y:0}});
 
-			_socket.on('players connected',function(msg) {
+			addSocketHandler(socket,'players connected',function(socket,msg) {
 				for(var i=0;i<msg.length;++i) {
 					KNOWN_PLAYERS[msg[i].canonical]=msg[i];
 					addChatInformationalMessage(msg[i].HTML+" has connected.");
 				}
-			});
-			_socket.on('player disconnected',function(msg) {
+			},[{literal:"",canonical:"",HTML:""}]);
+
+			addSocketHandler(socket,'player disconnected',function(socket,msg) {
 				if(!KNOWN_PLAYERS[msg]) {
 					addChatInformationalMessage("Unidentified Player has disconnected.");
 				} else {
 					addChatInformationalMessage(KNOWN_PLAYERS[msg].HTML+" has disconnected.");
 					delete KNOWN_PLAYERS[msg];
 				}
-			});
+			},"");
 			document.getElementById('chat').style.display='block';
-			_socket.on('chat',onChat);
+			addSocketHandler(socket,'chat',onChat,{type:"",data:"",time:0,from:""});
 
-		});
+		},"");
 
 		this.socket.emit('identify', identification);
 	},

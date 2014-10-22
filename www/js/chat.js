@@ -3,7 +3,7 @@ function appendAndScroll(el) {
 	e.appendChild(el);
 	e.scrollTop = e.scrollHeight
 }
-function onChat(msg) {
+function onChat(socket,msg) {
 	var d=document.createElement('div');
 	d.className='chat-message';
 	var s;
