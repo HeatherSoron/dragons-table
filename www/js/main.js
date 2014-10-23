@@ -226,12 +226,8 @@ var app = {
 	},
 	
 	deserialiseMapData: function(data) {
-		if (data.rows) {
-			document.getElementById('rows').value = data.rows;
-		}
-		if (data.cols) {
-			document.getElementById('cols').value = data.cols;
-		}
+		document.getElementById('rows').value = data.rows;
+		document.getElementById('cols').value = data.cols;
 		
 		var objList = data.objects;
 		for (var i = 0; i < objList.length; ++i) {
