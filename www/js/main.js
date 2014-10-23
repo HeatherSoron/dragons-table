@@ -240,7 +240,7 @@ var app = {
 		this.recalcMap(true);
 	},
 
-	configureSocket: function(url,n) {
+	configureSocket: function(url, myName) {
 		this.socket = io(url);
 
 		setupButtonsConnected();
@@ -275,9 +275,9 @@ var app = {
 
 		addSocketHandler(this.socket,'name accepted',function(socket,msg) {
 			// THIS means that the server accepts us
-			log("Name accepted: " + n.canonical);
-			addChatInformationalMessage("You have connected as "+n.HTML);
-			KNOWN_PLAYERS[n.canonical]=n;
+			log("Name accepted: " + myName.canonical);
+			addChatInformationalMessage("You have connected as "+myName.HTML);
+			KNOWN_PLAYERS[myName.canonical]=myName;
 
 			addSocketHandler(socket,'map sync',function(socket,msg) {
 				app.syncMapData(msg);
