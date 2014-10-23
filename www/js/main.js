@@ -249,6 +249,10 @@ var app = {
 
 		// At this point, we are only connected AT THE SOCKET LEVEL.
 		addSocketHandler(this.socket,'alert',function(socket,msg){alert(msg)},"");
+		addSocketHandler(this.socket,'server disconnected',function(socket,msg){
+			alert("Server disconnected. "+msg);
+			app.disconnect();
+		},"");
 
 		var identification = {
 			version: CLIENT_VERSION,
@@ -344,6 +348,7 @@ var app = {
 
 		setupButtonsDisonnected();
 		addChatInformationalMessage("You have disconnected.");
+		KNOWN_PLAYERS={}
 	},
 	
 	download: function() {

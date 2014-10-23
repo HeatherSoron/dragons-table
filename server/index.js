@@ -223,3 +223,17 @@ function validVersion(version) {
 	}
 	return true;
 }
+
+
+process.on('SIGINT', function() {
+	console.log("\nShutting down...")
+	for(var i in SOCKETS) {
+		// TODO: When we make the reserved names non-null, figure out how to skip them.
+		// I am thinking that the reserved names will get fake sockets (to support multiple DMs) that we can detect
+		if(SOCKETS[i]) {
+			SOCKETS[i].emit('server disconnected',"Shutdown requested by the CLI (^C).");
+			SOCKETS[i].disconnect();
+		}
+	}
+	process.exit();
+});
