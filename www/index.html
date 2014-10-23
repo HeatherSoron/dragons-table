@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<script type="text/javascript" src="js/shared/names.js"></script>
 		<script type="text/javascript" src="js/chat.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/map.js"></script>
@@ -15,10 +16,10 @@
 		</div>
 
 		<div class="networking">
-			Host: <input id="hostname"/>
-			<button onclick="app.connect()">Connect</button>
-			<button onclick="app.download()">Download</button>
-			<button onclick="app.upload()">Upload</button>
+			Host: <input id="hostname"/> <input id="username" placeholder='username'/>
+			<button id='connect-button' onclick="app.connect()">Connect</button>
+			<button id='download-button' onclick="app.download()" disabled>Download</button>
+			<button id='upload-button' onclick="app.upload()" disabled>Upload</button>
 		</div>
 		
 		<div class="map">

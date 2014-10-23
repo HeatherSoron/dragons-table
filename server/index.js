@@ -5,12 +5,13 @@ var cors = require('cors');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
+var names = require('../www/js/shared/names.js');
 
 var state = {
 	objects: [],
 };
 
-var minClientVersion = '0.3.0';
+var minClientVersion = '0.3.2';
 
 
 app.use(bodyParser.json());
@@ -43,18 +44,11 @@ function addSocketHandler(socket, command, handler) {
 }
 
 io.on('connection', function(socket) {
+	socket.playerData={};
 	console.log('WebSockets connection started');
 	addSocketHandler(socket,'identify',onIdentify);
 	addSocketHandler(socket,'debug test',onDebugTest);
-	var interval=setInterval(function(){
-		if (socket.disconnected || socket.identified)
-		{
-			clearTimeout(interval);
-			return;
-		}
-		console.log("Requesting re-identification...");
-		socket.emit('re-identify');
-	},1000);
+	addSocketHandler(socket,'disconnect',onDisconnect);
 });
 
 var CHATLOG_NAME=null;
@@ -97,23 +91,68 @@ function getChatlogName(){
 	return CHATLOG_NAME;
 }
 
+var SOCKETS={}
+// hardcode some names to sockets.
+// TODO: Don't map these to null, figure out how to set them to a socket or even multiple sockets!
+// Probably do it by making a fake socket that supports emit and everything else we need
+SOCKETS["dm"]=null;
+SOCKETS["dms"]=null;
+SOCKETS["dungeonmaster"]=null;
+SOCKETS["dungeon master"]=null;
+SOCKETS["gm"]=null;
+SOCKETS["gms"]=null;
+SOCKETS["gamemasters"]=null;
+SOCKETS["game masters"]=null;
+SOCKETS["me"]=null;
+SOCKETS["self"]=null;
+SOCKETS["all"]=null;
+SOCKETS["everyone"]=null;
+SOCKETS["broadcast"]=null;
+SOCKETS["unidentified player"]=null;
+// TODO: Figgure out how to blacklist ![anything]
+
 
 // -----------------------------------------------------------------------------
 // Handlers
 function onIdentify(socket,msg) {
 	if (socket.identified) { return; } // DO NOT allow multiple identifies, that way lies madness.
-	socket.identified = true; // Ensure that this is set as early as possible to mitigate potential races
-
-	console.log("connection identified as: " + JSON.stringify(msg));
 
 	if (validVersion(msg.version)) {
+		var n=names.createName(msg.username);
+		if(!n) {
+			socket.emit('invalid player name',{reason:"Name contains invalid characters",name:msg.username});
+			return;
+		}
+
+		if(SOCKETS[n.canonical]) {
+			socket.emit('invalid player name',{reason:"Name in use",name:msg.username});
+			return;
+		}
+		socket.emit('name accepted',msg.username)
+		SOCKETS[n.canonical]=socket;
+		socket.identified = true; // I think races are less of a problem than mis-identifying!
+		console.log("connection identified as: " + JSON.stringify(msg))
+
 		socket.emit('map sync', state);
+		socket.playerData.username=n;
+		socket.broadcast.emit('players connected',[n]);
+		var others=[];
+		for(var i in SOCKETS) {
+			// TODO: When we make the reserved names non-null, figure out how to skip them.
+			// I am thinking that the reserved names will get fake sockets (to support multiple DMs) that we can detect
+			if(SOCKETS[i] && SOCKETS[i]!=socket) {
+				others.push(SOCKETS[i].playerData.username)
+			}
+		}
+		if(others.length) {
+			socket.emit('players connected',others);
+		}
 
 		addSocketHandler(socket,'map sync',onMapSync);
 		addSocketHandler(socket,'ghost',onGhost);
 		addSocketHandler(socket,'chat',onChat);
 	} else {
-		socket.emit('alert', "Update your client.\n\nYour version: " + msg.version + '\nMinimum version: ' + minClientVersion);
+		socket.emit('invalid version',{required:minClientVersion,yours:msg.version});
 		console.log('Obsolete connection detected. Data: ' + JSON.stringify(msg));
 	}
 	return msg;
@@ -134,9 +173,25 @@ function onGhost(socket,msg) {
 }
 function onChat(socket,msg) {
 	// TODO: Do SO MUCH MORE here.
+	var n="Unidentified Player";
+	if(socket.playerData && socket.playerData.username) {
+		n=socket.playerData.username.canonical;
+	}
+	msg.from=n;
 	socket.broadcast.emit('chat', msg);
 	socket.emit('chat', msg);
 	return msg;
+}
+function onDisconnect(socket,msg) {
+	var n="Unidentified Player";
+	if(socket.playerData && socket.playerData.username) {
+		n=socket.playerData.username.canonical;
+		delete SOCKETS[n];
+	}
+
+	socket.broadcast.emit('player disconnected',n);
+	console.log("WebSocket disconnceted for "+n);
+	return {username:n}
 }
 // End Handlers
 // -----------------------------------------------------------------------------
