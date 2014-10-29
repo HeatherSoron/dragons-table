@@ -18,6 +18,17 @@ function log(msg) {
 	elem.innerHTML = msg + "\n" + elem.innerHTML;
 }
 
+function inputAsInt(id) {
+	var n=parseInt(document.getElementById(id).value);
+	if(isNaN(n)) { return 0; } // this can happen if the input is set to the empty string, which is allowed. 0 seems like the sanest default in that case
+	return n;
+}
+function inputAsFloat(id) {
+	var n=parseFloat(document.getElementById(id).value);
+	if(isNaN(n)) { return 0; } // this can happen if the input is set to the empty string, which is allowed. 0 seems like the sanest default in that case
+	return n;
+}
+
 var KNOWN_PLAYERS={};
 
 function addSocketHandler(socket, command, handler,prototypicalObject) {
@@ -140,14 +151,14 @@ var app = {
 	},
 	
 	addMapObject: function() {
-		var x = parseInt(document.getElementById("x-coord").value);
-		var y = parseInt(document.getElementById("y-coord").value);
+		var x = inputAsInt("x-coord");
+		var y = inputAsInt("y-coord");
 		
-		var size = parseFloat(document.getElementById("obj-size").value);
+		var size = inputAsFloat("obj-size");
 		
-		var r = parseInt(document.getElementById("red").value);
-		var g = parseInt(document.getElementById("green").value);
-		var b = parseInt(document.getElementById("blue").value);
+		var r = inputAsInt("red");
+		var g = inputAsInt("green");
+		var b = inputAsInt("blue");
 		
 		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 		
@@ -161,9 +172,9 @@ var app = {
 	},
 	
 	recalcMap: function(localOnly) {
-		footScale = parseInt(document.getElementById("foot-to-px").value);
-		rows = parseInt(document.getElementById("rows").value);
-		cols = parseInt(document.getElementById("cols").value);
+		footScale = inputAsInt("foot-to-px");
+		rows = inputAsInt("rows");
+		cols = inputAsInt("cols");
 		
 		this.map.recalc(footScale, rows, cols);
 		if (!localOnly) {
@@ -190,7 +201,7 @@ var app = {
 	removeMapObject: function() {
 		var elem = document.getElementById("object-list");
 		var selected = elem.options[elem.selectedIndex];
-		this.map.objects.splice(parseInt(selected.value), 1);
+		this.map.objects.splice(parseInt(selected.value), 1); // QUESTION: Can selected.value ever be the empty string or a non-integer? parseInt will return NaN in that case.
 		this.recalcMap();
 	},
 	
